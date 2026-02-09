@@ -25,7 +25,7 @@ from typing import Optional
 # Set this to True ONLY when Redis is available (Docker/K8s)
 # For now, keep it False so you can test locally.
 # ---------------------------------------------------------
-USE_REDIS = False
+USE_REDIS = True
 
 
 # ---------------------------------------------------------
