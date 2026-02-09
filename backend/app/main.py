@@ -55,7 +55,7 @@ def health_check():
 @app.post("/shorten")
 def shorten_url(request: URLRequest):
     # Save the URL using storage layer
-    short_code = save_url(request.url)
+    short_code = save_url(str(request.url))
 
     # Return both the code and a ready-to-use short URL
     return {
