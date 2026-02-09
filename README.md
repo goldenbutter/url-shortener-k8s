@@ -167,7 +167,7 @@ Shorten URL → `POST /shorten`
 
 Redirect → `GET /{short_code}`
 
-## 7. Running with Docker
+## 7-A. Running with Docker
 ### **1. Build the Docker image**
 From inside the `backend` folder:
 ```bash
@@ -183,3 +183,82 @@ http://localhost:8000/health
 ```
 
 ---
+
+
+##  Screenshots
+
+- **backend testing** - redirect
+
+<img width="700" height="450" alt="backend-port-8000" src="assets\test-localhost-8000.png" />
+
+- **backend testing** - health check
+
+<img width="350" height="200" alt="backend-port-8000" src="assets\test-localhost-8000-health.png" />
+
+---
+
+## 7‑B. Running with Docker (Redis Mode)
+
+This mode enables Redis‑backed storage for short URLs.  
+Use this when running the backend in Docker or Kubernetes.
+
+---
+
+### 1. Start Redis in Docker
+
+Run Redis locally using Docker:
+
+```bash
+docker run -p 6379:6379 redis:alpine
+```
+
+This starts Redis on:
+
+- Host: localhost
+
+- Port: 6379
+
+### 2. Enable Redis mode in the backend
+Inside `backend/app/storage.py`, set:
+
+```
+USE_REDIS = True
+```
+### 3. Run the backend container with Redis environment variables
+Because Redis is running on your host machine, and the backend runs inside Docker,
+use host.docker.internal so the container can reach your host:
+```
+docker run -p 8000:8000 \
+  -e REDIS_HOST=host.docker.internal \
+  -e REDIS_PORT=6379 \
+  url-shortener-backend
+```
+<img width="720" height="280" alt="reddis-port-8000" src="assets\docker-run-redis.png" />
+
+### 4. Test the API
+Shorten a URL:
+```
+curl -X POST http://localhost:8000/shorten \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://google.com"}'
+```
+Expected response:
+```
+{
+  "short_code": "LVNFz1",
+  "short_url": "http://localhost:8000/LVNFz1"
+}
+```
+<img width="937" height="180" alt="reddis-port-8000" src="assets\test-redirect-curl.png" />
+
+Redirect:
+Open in browser:
+```
+http://localhost:8000/LVNFz1
+```
+##  Screenshots
+
+- **Redis-Docker testing** - redirect
+
+<img width="700" height="450" alt="reddis-port-8000" src="assets\test-docker-redis-8000.png" />
+
