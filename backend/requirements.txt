@@ -1,0 +1,14 @@
+# FastAPI framework for building the API
+fastapi==0.115.2
+
+# Uvicorn ASGI server to run FastAPI in production
+uvicorn[standard]==0.30.1
+
+# Redis client (we will use this in Step 4 when switching storage to Redis)
+redis==5.0.3
+
+# Pydantic for data validation (FastAPI uses this internally)
+pydantic==2.7.4
+
+# Optional: python-dotenv for local development environment variables
+python-dotenv==1.0.1

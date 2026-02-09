@@ -1,0 +1,58 @@
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+.venv/
+venv/
+env/
+
+# FastAPI / Django / Flask temporary
+instance/
+*.db
+*.sqlite3
+
+# Node / Frontend
+node_modules/
+dist/
+build/
+*.log
+
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-data/
+*.pid
+
+# Kubernetes
+*.kubeconfig
+
+# Coverage & Testing
+.coverage
+pytest_cache/
+coverage.xml
+
+# PDFs / Generated assets
+*.pdf
+assets/pdf/*.pdf
+
+# Local Dev
+.idea/
+*.swp
+*.swo
