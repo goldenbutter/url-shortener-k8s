@@ -12,6 +12,7 @@ The actual storage logic (in‑memory for now, Redis later)
 lives in storage.py so this file stays clean and modular.
 """
 
+import os
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, HttpUrl
@@ -56,11 +57,13 @@ def health_check():
 def shorten_url(request: URLRequest):
     # Save the URL using storage layer
     short_code = save_url(str(request.url))
+    import os
+    BASE_URL = os.getenv("PUBLIC_BASE_URL", "http://localhost:8000")
 
     # Return both the code and a ready-to-use short URL
     return {
         "short_code": short_code,
-        "short_url": f"http://localhost:8000/{short_code}"
+        "short_url": f"{BASE_URL}/{short_code}"
     }
 
 
