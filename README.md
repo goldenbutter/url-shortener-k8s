@@ -3,7 +3,7 @@
 A lightweight, production‑ready **URL Shortener** service built with **FastAPI**, designed to run locally, in **Docker**, and in **Kubernetes**.  
 It provides a simple API to shorten URLs, store them (in‑memory or Redis), and redirect users using short codes.
 
----
+
 
 ## 1. Project Overview
 
@@ -18,25 +18,25 @@ It supports:
 
 The service is fully containerized and includes Kubernetes manifests for deployment.
 
----
+
 
 ## 2. Features
 
-- 🚀 FastAPI backend  
-- 🔗 URL shortening  
-- ↪️ Redirect support  
-- ❤️ Health check endpoint  
-- 🧠 Hybrid storage system  
+- FastAPI backend  
+- URL shortening  
+- Redirect support  
+- Health check endpoint  
+- Hybrid storage system  
   - **In‑memory mode** (local development)  
   - **Redis mode** (Docker/K8s)  
-- 🐳 Docker‑ready  
-- ☸️ Kubernetes manifests included  
+- Docker‑ready  
+- Kubernetes manifests included  
 
----
+
 
 ## 3. Architecture Overview
 
-### **Local (In‑Memory Mode)**
+### A. *Local (In‑Memory Mode)*
 
 ```
 Client → FastAPI Backend → In‑Memory Storage
@@ -61,7 +61,7 @@ Client → FastAPI Backend → In‑Memory Storage
                  └──────────────────────────┘
 ```
 
-### **Docker / Kubernetes (Redis Mode)**
+### B. *Docker / Kubernetes (Redis Mode)*
 
 ```
 Client → FastAPI Backend → Redis
@@ -92,7 +92,7 @@ Client → FastAPI Backend → Redis
                  └──────────────────────────┘
 ```
 
----
+
 
 ## 4. Tech Stack
 
@@ -103,7 +103,7 @@ Client → FastAPI Backend → Redis
 - **Docker**
 - **Kubernetes (k8s)**
 
----
+
 
 ## 5. Folder Structure
 
@@ -130,76 +130,78 @@ url-shortener-k8s/
     └── service.yaml
 ```
 
----
 
-## 6. Local Development Setup
 
-### **1. Create and activate virtual environment**
+## 6. Development Setup (Local PC)
+
+### A. *Create and activate virtual environment*
 
 ```bash
 python -m venv venv
-source venv/Scripts/activate   # Git Bash
+source venv/Scripts/activate
 ```
 
-### **2. Install dependencies**
+### B. *Install dependencies*
 
 ```bash
 pip install -r backend/requirements.txt
 ```
-### **3. Ensure in‑memory mode is enabled**
+### C. *Ensure in‑memory mode is enabled*
 Inside `backend/app/storage.py`:
 
 ```
 USE_REDIS = False
 ```
 
-### **4. Run the backend**
+### D. *Run the backend*
 From project root:
 
-```
+```bash
 uvicorn backend.app.main:app --reload
 ```
 
-### **5. Test endpoints**
+### E. *Test endpoints*
 Health check → `GET /health`
 
 Shorten URL → `POST /shorten`
 
 Redirect → `GET /{short_code}`
 
-## 7-A. Running with Docker (In-memory)
-### **1. Build the Docker image**
+## 7.A. Running with Docker (In-memory)
+
+### *1. Build the Docker image*
 From inside the `backend` folder:
 ```bash
 docker build -t url-shortener-backend .
 ```
-### **2. Run the container**
+
+### *2. Run the container*
 ```bash
 docker run -p 8000:8000 url-shortener-backend
 ```
-### **3. Test the service**
-```
+
+### *3. Test the service*
+```h
 http://localhost:8000/health
 ```
 
----
+### *4. Test the API*
+**Shorten a URL:**
 
-### 4. Test the API
-Shorten a URL:
-```
+```bash
 curl -X POST http://localhost:8000/shorten \
   -H "Content-Type: application/json" \
   -d '{"url": "https://google.com"}'
 ```
-Expected response:
-```
+**Expected response:**
+
+```json
 {
   "short_code": "LVNFz1",
   "short_url": "http://localhost:8000/LVNFz1"
 }
 ```
 
-##  Screenshots
 
 - **backend testing** - curl
 
@@ -214,16 +216,14 @@ Expected response:
 <img width="350" height="200" alt="backend-port-8000" src="assets\test-localhost-8000-health.png" />
 
 
----
+## 7.B. Running with Docker Compose (Backend + Redis)
 
-## 7‑B. Running with Docker Compose (Backend + Redis)
+**Docker Compose allows you to run the entire stack (FastAPI backend + Redis) with a single command.** <br>
+**This is the recommended way to run the project locally in Redis mode.**
 
-Docker Compose allows you to run the entire stack (FastAPI backend + Redis) with a single command.  
-This is the recommended way to run the project locally in Redis mode.
 
----
 
-### 1. docker-compose.yml
+### *a. docker-compose.yml*
 
 The project includes a `docker-compose.yml` file that defines:
 
@@ -233,97 +233,303 @@ The project includes a `docker-compose.yml` file that defines:
 - Environment variables for Redis connectivity  
 - A persistent Redis volume  
 
----
 
-### 2. Enable Redis mode in the backend
+### *b. Enable Redis mode in the backend*
 Inside `backend/app/storage.py`, set:
 
 ```
 USE_REDIS = True
 ```
 
-### 3. Start the container
+### *c. Start the container*
 
-From the project root:
+ - **From the project root:**
 
 ```bash
 docker compose up --build
 ```
 
-This starts Redis on:
+ - **This starts Redis on:**
 
 - Build the backend image
 - Start Redis
 - Start the backend
 - Connect both services inside the same Docker network
 
-Backend will be available at:
 
+### *d. Test the API*
 
+**Shorten a URL:**
 
-
-
-### 4. Test the API
-Shorten a URL:
-```
+```bash
 curl -X POST http://localhost:8000/shorten \
   -H "Content-Type: application/json" \
   -d '{"url": "https://google.com"}'
 ```
-Expected response:
-```
+**Expected response:**
+
+```json
 {
   "short_code": "mJj1SK",
   "short_url": "http://localhost:8000/mJj1SK"
 }
 ```
+
 <img width="899" height="127" alt="reddis-port-8000" src="assets\test-redirect-curl-redis.png" />
 
-Redirect:
-Open in browser:
-```
+**Redirect:**
+*Open in browser:*
+```h
 http://localhost:8000/mJj1SK
 ```
-##  Screenshots
 
 - **Redis-Docker testing** - redirect
 
 <img width="730" height="650" alt="backend-port-8000" src="assets\test-localhost-8000.png" />
 
-### 5. Verify Redis storage
+### *e. Verify Redis storage*
 
-Open a Redis shell:
+ - **Open a Redis shell:**
+
 ```bash 
 docker exec -it urlshort-redis redis-cli 
 ```
-List stored short codes:
+
+ - **List stored short codes:**
+
 ```bash 
 keys short:* 
 ```
-Retrieve a URL:
+**Retrieve a URL:**
+
 ```bash 
 get short:<short_code> 
 ```
 <img width="900" height="175" alt="backend-port-8000" src="assets\verify-redis-storage.png" />
 
-### 6. Stop the stack
+### *f. Stop the stack*
 
 ```bash 
 docker compose down
  ```
-To remove Redis data as well:
+ - **To remove Redis data as well:**
 
 ```bash 
 docker compose down -v
  ```
 
+## 8. Environment Variables
 
-## 8. Contributing & Future Improvements
+The backend uses a small set of environment variables to control storage behavior and Redis connectivity.
+
+ - ### Required Variables
+
+| Variable       | Description                                      | Example            |
+|----------------|--------------------------------------------------|--------------------|
+| `USE_REDIS`    | Enables Redis mode (`true` or `false`)           | `true`             |
+| `REDIS_HOST`   | Redis hostname or service name                   | `redis`            |
+| `REDIS_PORT`   | Redis port number                                | `6379`             |
+
+ - ### Optional Variables
+
+| Variable           | Description                                | Example            |
+|--------------------|--------------------------------------------|--------------------|
+| `REDIS_PASSWORD`   | Password for secured Redis instances        | `mypassword123`    |
+
+ - ### How They Are Used
+
+   - When `USE_REDIS=false` → the app uses **in‑memory storage** (Python dictionary)
+   - When `USE_REDIS=true` → the app uses **Redis** for persistent storage
+
+These variables are set automatically in `docker-compose.yml`, but you can override them manually if needed.
+
+
+
+## 9. API Endpoints
+
+The backend exposes three main endpoints.
+
+
+### *A. Health Check*
+
+ **GET /health**
+
+Returns a simple status message used by Docker/Kubernetes.
+
+ **Response:**
+
+```json
+{ "status": "ok" }
+```
+
+### *B. Shorten a URL*
+
+ - **POST /shorten**
+
+**Accepts a JSON body:**
+
+```json
+{
+  "url": "https://example.com"
+}
+```
+
+**Response:**
+
+```json
+{
+  "short_code": "abc123",
+  "short_url": "http://localhost:8000/abc123"
+}
+```
+
+### *C. Redirect to Original URL*
+
+**GET /{short_code}**
+
+*Example:*
+
+```
+GET /abc123
+```
+
+**Behavior:**
+- If the short code exists → redirects (HTTP 307) to the original URL
+- If not found → returns `404 Not Found`
+
+
+
+
+## 10. Redis vs In‑Memory Mode
+
+The application supports two storage backends:
+
+
+
+### 🧠 In‑Memory Mode (Default for Local Development)
+
+- Enabled when `USE_REDIS=false`
+- Uses a simple Python dictionary
+- Fast and easy for local testing
+- Data is lost when the server restarts
+
+---
+
+### 🗄️ Redis Mode (Recommended for Docker/Kubernetes)
+
+- Enabled when `USE_REDIS=true`
+- Stores URLs in Redis using keys like:
+- Data persists across restarts
+- Works seamlessly with Docker Compose and Kubernetes
+- Required for scaling horizontally (multiple backend replicas)
+
+---
+
+### When to Use What?
+
+| Environment     | Recommended Mode |
+|-----------------|------------------|
+| Local testing   | In‑memory        |
+| Docker Compose  | Redis            |
+| Kubernetes      | Redis            |
+| Production      | Redis            |
+
+
+## 11. Kubernetes Deployment Guide
+
+This project is designed to run cleanly inside Kubernetes.  
+Below is a high‑level guide for deploying the backend and Redis.
+
+
+
+### A. Create a Namespace
+
+```bash
+kubectl apply -f k8s/namespace.yaml
+```
+
+### B. Redis deployment and service
+
+```bash
+kubectl apply -f k8s/redis/deployment.yaml
+kubectl apply -f k8s/redis/service.yaml
+```
+
+### C. Backend ConfigMap & deployment
+
+```bash
+kubectl apply -f k8s/backend/configmap.yaml
+kubectl apply -f k8s/backend/deployment.yaml
+```
+
+### D. Backend service (NodePort)
+
+```bash
+kubectl apply -f k8s/backend/service.yaml
+```
+
+### E. Verify deployment & services:
+
+```bash
+kubectl get pods -n url-shortener
+kubectl get svc -n url-shortener
+```
+
+<img width="887" height="147" alt="backend-port-8000" src="assets\kubectl-get-pods.png" />
+
+
+### F. Test the API inside Kubernetes
+Create a short URL:
+
+```bash
+curl -X POST http://localhost:30080/shorten \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://google.com"}'
+```
+Output : 
+
+```json
+{
+  "short_code": "gUkvW6",
+  "short_url": "http://localhost:30080/gUkvW6"
+}
+```
+
+<img width="883" height="124" alt="backend-port-8000" src="assets\k8s-test-curl.png" />
+
+
+### G. Test redirect:
+
+Open in a browser:
+
+```h
+http://localhost:30080/gUkvW6
+```
+
+<img width="941" height="659" alt="backend-port-8000" src="assets\k8s-test-redirect.png" />
+
+###  H. Inspecting Redis data (optional)
+
+```bash
+kubectl get pods -n url-shortener
+kubectl exec -it <redis-pod-name> -n url-shortener -- sh
+```
+
+<img width="893" height="141" alt="backend-port-8000" src="assets\k8s-redis-storage-check.png" />
+
+###  I. Cleanup
+
+```bash
+kubectl delete namespace url-shortener
+```
+
+
+## 12. Contributing & Future Improvements
 
 This project is designed to be simple, modular, and easy to extend.  
 If you want to contribute or improve the system in the future, here are some recommended areas:
 
----
+
 
 ### 🔧 1. Add New Features
 - URL expiration (TTL) using Redis `EXPIRE`
@@ -332,7 +538,7 @@ If you want to contribute or improve the system in the future, here are some rec
 - QR code generation for each short URL
 - Admin dashboard for viewing stored URLs
 
----
+
 
 ### 🗄️ 2. Improve Storage Layer
 - Add Redis authentication (`REDIS_PASSWORD`)
@@ -340,7 +546,7 @@ If you want to contribute or improve the system in the future, here are some rec
 - Add PostgreSQL or MongoDB as optional backends
 - Add caching layer for frequently accessed URLs
 
----
+
 
 ### 🐳 3. Enhance Docker & Deployment
 - Add Docker healthchecks for backend and Redis
@@ -349,7 +555,7 @@ If you want to contribute or improve the system in the future, here are some rec
 - Add Horizontal Pod Autoscaler (HPA)
 - Add CI/CD pipeline (GitHub Actions)
 
----
+
 
 ### 🧪 4. Testing & Quality
 - Add unit tests for storage layer
@@ -357,7 +563,7 @@ If you want to contribute or improve the system in the future, here are some rec
 - Add load testing (k6 / Locust)
 - Add linting (flake8, black, isort)
 
----
+
 
 ### 📚 5. Documentation
 - Expand API documentation
@@ -365,7 +571,7 @@ If you want to contribute or improve the system in the future, here are some rec
 - Add sequence diagram for request flow
 - Add troubleshooting section
 
----
+
 
 ### 🤝 6. How to Contribute
 1. Fork the repository  
@@ -376,12 +582,12 @@ If you want to contribute or improve the system in the future, here are some rec
 
 All contributions are welcome — from small fixes to major features.
 
-## 9. Contribution Workflow
+## 13. Contribution Workflow
 
 If you want to improve this project, please follow the workflow below.  
 This helps keep development organized and ensures everyone works on clearly defined tasks.
 
----
+
 
 ### 📝 1. Create an Issue
 Before starting any work:
@@ -394,7 +600,7 @@ Before starting any work:
 
 This helps avoid duplicate work and lets others discuss the idea.
 
----
+
 
 ### 👤 2. Assign the Issue to Yourself
 Inside the issue page:
@@ -404,7 +610,7 @@ Inside the issue page:
 
 If you cannot assign yourself (permissions), mention in the issue that you are taking it.
 
----
+
 
 ### 🍴 3. Fork the Repository
 Click **“Fork”** at the top right of the repo.
@@ -416,7 +622,7 @@ This creates your own copy where you can safely:
 - Experiment  
 - Make changes without affecting the main project  
 
----
+
 
 ### 🛠️ 4. Implement Your Changes in Your Fork
 Inside your fork:
@@ -428,7 +634,7 @@ Inside your fork:
 
 If your change affects deployment (Docker, Compose, Kubernetes), update the README as well with proper screenshots.
 
----
+
 
 ### 🔄 5. Submit a Pull Request (PR)
 When your work is ready:
@@ -443,7 +649,7 @@ When your work is ready:
 
 The maintainers will review your PR and merge it if everything looks good.
 
----
+
 
 ### 🤝 6. Collaboration Guidelines
 - Keep PRs focused on one issue at a time  
